@@ -1,0 +1,31 @@
+language: java
+addons:
+  sonarcloud:
+    organization: inveasy
+script:
+- mvn clean install sonar:sonar -Dsonar.login=${SONAR_LOGIN} -B -V
+cache:
+  directories:
+  - "$HOME/.m2/repository"
+  - "$HOME/.sonar/cache"
+deploy:
+  - provider: releases
+    api_key:
+      secure: tPHwM9sUKaphOXvlsOl68BjEBOtSlbkqlASSiTspxLQa9Zbanuitfp2i/LIfHvsM/EVy/O3HneqgaA2cUGFMOoGgLJSbo1Ja/sQ+q4rMfV3VOtexNcxXpP0+HtmFLEbN0lKRjWIfdhzUlXRusPqFMdH4JL0SFdEULolS7Iz0plnfSuswa6SseCDffRCz52bQY5RBIz5t43yP6e+qzb4NGY0uR4bCsL6/HTBQaO4X8xYYl8HX/kdUfZa0cZT8dItiIzYiXUak14/bDWDpvzS47x69Ww9Yk3iKO0AcxvaZqxnXh2tm/BEqzCS19Be4WyTe6S9vsamrpRGhOaySudZusig8N/HDsNWDnVKNQ6kOdgCXmZ7Z/CadJXDxuJl0qfpVrlzsNExwqE5hHt11ztEqsCDMcM5T88sli0Buy1NJ/Rj14lZ1Wh5wnzI2BZQMBzVmjLFan5y4DiV9SUmwTz4+x22NofqjoElpfU0EsOTdDQprscXyWaXoqr2DZLw2GFQlRHo1+JdJFE3Pnt3C/MCzUqmVNCBbqFoSr6qeOlG9hPChLgJGCxEvN21ucq4GTartp7611i+Vui5m0JWx7pZC7ku3sthZlDsQCGvyRzhn0tUiJsFhuDbnTkpibRzWLyTTU9wXnEAGQWUlp3hQJ2uPb38RocQczuma/yCcYEX13+Q=
+    file_glob: true
+    file: target/*.jar
+    skip_cleanup: true
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^[0-9]+\.[0-9]+\.[0-9]+$
+      tags: true
+  - provider: bintray
+    file: bintray-descriptor.json
+    key:
+      secure: PWFsRBK7nxd2QNU0DUbeQbbCFPlRs19aQqcAwG90lJDXpa/bpS+CHeyKSf2CRnqOq4sUMoAVNz4saINX9ZtbdnUIHotLJGL6f+k64gwezMVlrnsY2Hvg94cDbjGhtDXFzpu4gVk1QDjkQQ2w20oibx9CtmZppeh1aPC/Jroi5VTMcS+e1TBgNmZZy4hlxi9g96r/9U/OsH2uiR1zmyKR9d1uC63O9JPXTnaDy7j8hQDBZ9Tu2enCg6zZ5Xacd4zcrtQcxFoYjkxe0Jf2kstOaZTDFjk6mNPiLuNt3Duaa+sIV85/PZxIHjLVut/coRPILNq4tJxsN721U/GHYXlRuCm8hqBYoEwe95FHuVxFQuVv7VIlMnxHsa+CiT/1ttPdZ9kcA2Q9rJoZWqT8tZPLTQ0FPaK6tgH/S9rTYsH6DF3TcpFYfWlJyghCzuWXncZwg2/GWCY95hX6iHD0vyYiCfszxxHT6UCjdLteKeSx84bmxWJ02s1z2OeZiN8NyhlknZfb000NOgn/0sUTQV6FTKTjCy35SeCQoxwF17PWymhZ1EzqTqVoRKzzDKn8WVyk3rFkb+pv3m5uumIF2vzRPM4Qn/nte2kMv8D+U5iL+JqTrDRYoBFJYJqvxTXGVQbGOUad0F29HO9S8X4IbdabJFZ0U7wFQ7qcUv6n9EIFzlI=
+    user: goveranter
+    skip_cleanup: true
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^[0-9]+\.[0-9]+\.[0-9]+$
+      tags: true
