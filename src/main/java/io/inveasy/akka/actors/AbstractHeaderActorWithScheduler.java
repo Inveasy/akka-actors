@@ -116,6 +116,14 @@ public abstract class AbstractHeaderActorWithScheduler extends AbstractHeaderAct
 			lastScheduled.cancel();
 	}
 	
+	public void cancelSchedule(String name)
+	{
+		Cancellable scheduled = schedules.remove(name);
+		
+		if(scheduled != null && !scheduled.isCancelled())
+			scheduled.cancel();
+	}
+	
 	@Override
 	public void postStop()
 	{
