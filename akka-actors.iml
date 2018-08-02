@@ -15,7 +15,7 @@
     <orderEntry type="library" name="Maven: org.scala-lang:scala-library:2.12.6" level="project" />
     <orderEntry type="library" name="Maven: com.typesafe:config:1.3.3" level="project" />
     <orderEntry type="library" name="Maven: org.scala-lang.modules:scala-java8-compat_2.12:0.8.0" level="project" />
-    <orderEntry type="module" module-name="akka-serialization-protostuff" />
+    <orderEntry type="library" name="Maven: io.inveasy:akka-serialization-protostuff:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: io.protostuff:protostuff-core:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: io.protostuff:protostuff-api:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: io.protostuff:protostuff-runtime:1.6.0" level="project" />
