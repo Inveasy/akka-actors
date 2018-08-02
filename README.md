@@ -27,7 +27,7 @@ First, include the maven dependency in your build :
 
 ###### Message headers
 If you want to be able to include headers along with your messages,
-inherit your actors with ``` AbstractHeaderActor ``` or ``` AbstractHeaderActorWithTimers ```.
+inherit your actors with ``` AbstractHeaderActor ``` or ``` AbstractHeaderActorWithScheduler ```.
 
 Here is a sample implementation of a header actor :
 ```java
