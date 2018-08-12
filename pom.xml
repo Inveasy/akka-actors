@@ -11,7 +11,7 @@
 		Akka actor definitions for Inveasy framework
 	</description>
 
-	<version>1.1.0</version>
+	<version>1.2.0</version>
 
 	<inceptionYear>2018</inceptionYear>
 
@@ -92,6 +92,7 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
+					<parameters>true</parameters>
                 </configuration>
             </plugin>
 

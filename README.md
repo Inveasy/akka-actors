@@ -23,6 +23,23 @@ First, include the maven dependency in your build :
     <url>https://dl.bintray.com/inveasy/maven</url>
   </repository>
 </repositories>
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <!-- Version must be >= 3.6.2 -->
+      <version>3.7.0</version>
+      <configuration>
+        <source>8</source>
+        <target>8</target>
+    	<parameters>true</parameters>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+
 ```
 
 ###### Message headers
@@ -60,6 +77,35 @@ public class SomeActor extends AbstractHeaderActor
 		// That way you can send multiple messages without resetting headers
 		// Don't worry for passthru headers, as they are processed when message is sent
 		headers = new TreeMap<>();
+	}
+}
+```
+
+###### Asynchronous processing
+Process async messages is easy using ```AbstractYieldActor```. Its use is really simple, as follow :
+```java
+public class AsyncActor extends AbstractYieldActor
+{
+	// 1) Mark your methods with @YieldReceiver, indicating which message class it should expect
+	@YieldReceiver(expectedMessageType = SomeMessage.class)
+	// Request the message in parameters, in any order you want, ask for the context
+	// You can even request some vars in the context args by using the same name you registered them as parameter
+	private void someHandlingMethod(SomeMessage message, Yield context, String theParam)
+	{
+		// 2) When you need to send a message, call yield() before
+	    yield();
+	    tell(target, aMessage);
+	    
+	    // You can call yield() multiple times in the same method without problems
+	    yield();
+	    tell(anotherTarget, anotherMessage);
+	    
+	    // To pass context args (which you can get as method parameters, send them using yield()
+	    yield(new Pair<>("theParam", "someValue"));
+	    tell(target, aMessage);
+	    // When the method receiving the reply has theParam as String parameter name
+	    // value will be automagically applied
+	    // It resolves args by name, then checks if types are compatible (by using Class.isAssignableFrom)
 	}
 }
 ```
