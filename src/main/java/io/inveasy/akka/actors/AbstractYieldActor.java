@@ -152,6 +152,7 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 					// Try to resolve unresolved params
 					for(int i : unresolvedParams)
 					{
+						// TODO originalMessage is not mapped
 						if(context == null) // If we don't have any context, resolve all remaining params as null
 							methodParams[i] = null;
 						else
