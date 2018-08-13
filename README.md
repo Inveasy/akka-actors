@@ -42,9 +42,9 @@ First, include the maven dependency in your build :
 
 ```
 
-###### Message headers
+##### Message headers
 If you want to be able to include headers along with your messages,
-inherit your actors with ``` AbstractHeaderActor ``` or ``` AbstractHeaderActorWithScheduler ```.
+inherit your actors with ``` AbstractHeaderActor ```.
 
 Here is a sample implementation of a header actor :
 ```java
@@ -81,7 +81,7 @@ public class SomeActor extends AbstractHeaderActor
 }
 ```
 
-###### Asynchronous processing
+##### Asynchronous processing
 Process async messages is easy using ```AbstractYieldActor```. Its use is really simple, as follow :
 ```java
 public class AsyncActor extends AbstractYieldActor
@@ -92,7 +92,7 @@ public class AsyncActor extends AbstractYieldActor
 	// You can even request some vars in the context args by using the same name you registered them as parameter
 	private void someHandlingMethod(SomeMessage message, Yield context, String theParam)
 	{
-		// 2) When you need to send a message, call yield() before
+        // 2) When you need to send a message, call yield() before
 	    yield();
 	    tell(target, aMessage);
 	    
@@ -111,4 +111,5 @@ public class AsyncActor extends AbstractYieldActor
 ```
 
 ## Where is it used in Inveasy platform ?
-All actors have ```AbstractHeaderActor``` in their parents. Simple as hell.
+All actors have ```AbstractHeaderActor``` in their parents.
+Many uses ```AbstractYieldActor``` to easily use async message processing.
