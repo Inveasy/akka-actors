@@ -16,7 +16,6 @@
 
 package io.inveasy.akka.actors;
 
-import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSelection;
 import akka.japi.pf.ReceiveBuilder;
@@ -28,7 +27,7 @@ import scala.runtime.BoxedUnit;
 import java.util.Map;
 import java.util.TreeMap;
 
-public abstract class AbstractHeaderActor extends AbstractActor
+public abstract class AbstractHeaderActor extends AbstractSchedulerActor
 {
 	private Map<String, AbstractHeader> requestHeaders;
 	protected Map<String, AbstractHeader> getRequestHeaders() { return requestHeaders; }

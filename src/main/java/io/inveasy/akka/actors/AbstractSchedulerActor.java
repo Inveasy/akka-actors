@@ -16,13 +16,14 @@
 
 package io.inveasy.akka.actors;
 
+import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
 
 import java.time.Duration;
 import java.util.TreeMap;
 
-public abstract class AbstractHeaderActorWithScheduler extends AbstractHeaderActor
+public abstract class AbstractSchedulerActor extends AbstractActor
 {
 	private TreeMap<String, Cancellable> schedules = new TreeMap<>();
 	
@@ -126,15 +127,6 @@ public abstract class AbstractHeaderActorWithScheduler extends AbstractHeaderAct
 	
 	@Override
 	public void postStop()
-	{
-		schedules.values().forEach(Cancellable::cancel);
-	}
-	
-	/**
-	 * WARNING : overridden default behaviour : DOES NOT CALL preStart() !!!
-	 */
-	@Override
-	public void postRestart(Throwable reason)
 	{
 		schedules.values().forEach(Cancellable::cancel);
 	}
