@@ -16,8 +16,11 @@
 
 package io.inveasy.akka.actors;
 
+import akka.actor.ActorRef;
 import akka.japi.Pair;
 import akka.japi.pf.ReceiveBuilder;
+import io.inveasy.akka.actors.annotations.OriginalSender;
+import io.inveasy.akka.actors.annotations.Param;
 import io.inveasy.akka.actors.annotations.YieldReceiver;
 import io.inveasy.akka.actors.domain.AbstractHeader;
 import io.inveasy.akka.actors.domain.SimpleHeader;
@@ -35,13 +38,15 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 	{
 		private String yieldId;
 		private Object originalMessage;
+		private ActorRef originalSender;
 		private Map<String, AbstractHeader> originalRequestHeaders;
 		private TreeMap<String, Object> context = new TreeMap<>();
 		
-		private Yield(String yieldId, Object originalMessage, Map<String, AbstractHeader> requestHeaders, Pair<String, Object>[] contextArgs)
+		private Yield(String yieldId, Object originalMessage, ActorRef originalSender, Map<String, AbstractHeader> requestHeaders, Pair<String, Object>[] contextArgs)
 		{
 			this.yieldId = yieldId;
 			this.originalMessage = originalMessage;
+			this.originalSender = originalSender;
 			this.originalRequestHeaders = requestHeaders;
 			
 			for(Pair<String, Object> contextArg : contextArgs)
@@ -49,9 +54,17 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 		}
 		
 		public String getYieldId() { return this.yieldId; }
-		public <T> T getOriginalMessage(Class<T> cls)
+		public <T> T getOriginalTypedMessage(Class<T> cls)
 		{
-			return cls.cast(originalMessage);
+			return cls.cast(getOriginalMessage());
+		}
+		public Object getOriginalMessage()
+		{
+			return originalMessage;
+		}
+		public ActorRef getOriginalSender()
+		{
+			return originalSender;
 		}
 		public Map<String, AbstractHeader> getRequestHeaders()
 		{
@@ -70,6 +83,7 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 		{
 			private String yieldId;
 			private Object originalMessage;
+			private ActorRef originalSender;
 			private Map<String, AbstractHeader> requestHeaders;
 			private Pair<String, Object>[] contextArgs;
 			
@@ -83,13 +97,16 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 				this.yieldId = yieldId;
 				return this;
 			}
-			
+			public YieldBuilder setOriginalSender(ActorRef originalSender)
+			{
+				this.originalSender = originalSender;
+				return this;
+			}
 			public YieldBuilder setRequestHeaders(Map<String, AbstractHeader> requestHeaders)
 			{
 				this.requestHeaders = requestHeaders;
 				return this;
 			}
-			
 			public YieldBuilder setContextArgs(Pair<String, Object>[] contextArgs)
 			{
 				this.contextArgs = contextArgs;
@@ -98,7 +115,7 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 			
 			public Yield create()
 			{
-				return new Yield(yieldId, originalMessage, requestHeaders, contextArgs);
+				return new Yield(yieldId, originalMessage, originalSender, requestHeaders, contextArgs);
 			}
 		}
 	}
@@ -118,6 +135,7 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 				int messageParameterPosition = -1;
 				final Parameter[] parameters = method.getParameters();
 				int yieldContextPosition = -1;
+				int originalSenderPosition = -1;
 				
 				List<Integer> unresolvedParams = new ArrayList<>();
 				
@@ -128,12 +146,15 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 						messageParameterPosition = i;
 					else if(parameters[i].getType().isAssignableFrom(Yield.class))
 						yieldContextPosition = i;
+					else if(parameters[i].getAnnotation(OriginalSender.class) != null)
+						originalSenderPosition = i;
 					else // We add the unresolved type, we'll try to find if it is in the yield context
 						unresolvedParams.add(i);
 				}
 				
 				final int mParamPos = messageParameterPosition;
 				final int yCP = yieldContextPosition;
+				final int oSP = originalSenderPosition;
 				receiveBuilder.match(yieldReceiver.expectedMessageType(), o -> {
 					this.currentYield = new Yield.YieldBuilder(o)
 							.setRequestHeaders(getRequestHeaders());
@@ -148,17 +169,26 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 						methodParams[mParamPos] = o;
 					if(yCP != -1)
 						methodParams[yCP] = context;
+					if(oSP != -1 && context != null)
+						methodParams[oSP] = context.getOriginalSender();
 					
 					// Try to resolve unresolved params
 					for(int i : unresolvedParams)
 					{
-						// TODO originalMessage is not mapped
 						if(context == null) // If we don't have any context, resolve all remaining params as null
 							methodParams[i] = null;
 						else
 						{
-							Object contextObject = context.get(parameters[i].getName());
-							if(contextObject != null && parameters[i].getType().isAssignableFrom(contextObject.getClass()))
+							// If the parameter has the @Param annotation, use its value as param name
+							Param paramName = parameters[i].getAnnotation(Param.class);
+							String name = parameters[i].getName();
+							if(paramName != null)
+								name = paramName.value();
+							
+							Object contextObject = context.get(name);
+							if(context.getOriginalMessage() != null && parameters[i].getType().isAssignableFrom(context.getOriginalMessage().getClass()))
+								methodParams[i] = context.getOriginalMessage();
+							else if(contextObject != null && parameters[i].getType().isAssignableFrom(contextObject.getClass()))
 								methodParams[i] = contextObject;
 							else // TODO Make a second pass to search by type
 								methodParams[i] = null;
@@ -195,6 +225,7 @@ public abstract class AbstractYieldActor extends AbstractHeaderActor
 		String yieldId = UUID.randomUUID().toString();
 		
 		Yield yield = currentYield.setYieldId(yieldId)
+				.setOriginalSender(getSender())
 				.setContextArgs(contextArgs)
 				.create();
 		

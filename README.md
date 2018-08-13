@@ -107,6 +107,26 @@ public class AsyncActor extends AbstractYieldActor
 	    // value will be automagically applied
 	    // It resolves args by name, then checks if types are compatible (by using Class.isAssignableFrom)
 	}
+	
+	// These are the possible base parameters you can request
+	@YieldReceiver(expectedMessageType = Message.class)
+	private void anotherHandler(Message thisMessage,
+	        // The original message as stored in the yield context
+	        OriginalMessage originalMessage,
+	        // Please note that the annotation @OriginalSender IS REQUIRED
+	        // otherwise the actor ref will be resolved as a context argument
+	        @OriginalSender ActorRef originalSender,
+	        // The yield context object, you can live without it
+	        // as you can ask every vars in it with parameters mapping
+	        Yield context,
+	        // Some context arg, registered when yield() was called with arguments
+	        SomeType contextArg,
+	        // Use the @Param annotation to ask resolver to use the annotation
+	        // value instead of the parameter name when resolving context args
+	        @Param("argName") SomeOtherType contextArg2)
+	{
+		// Some implementation
+	}
 }
 ```
 
