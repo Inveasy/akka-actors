@@ -16,17 +16,17 @@
     "attributes": []
   },
   "version": {
-    "name": "1.2.0",
-    "desc": "Version 1.2.0 - Yield actor",
-    "released": "2018-08-12",
-    "vcs_tag": "1.2.0",
+    "name": "1.3.0",
+    "desc": "Version 1.3.0 - Scheduler is now the highest Inveasy actor parent",
+    "released": "2018-08-13",
+    "vcs_tag": "1.3.0",
     "attributes": [],
     "gpgSign": false
   },
   "files":
   [
-    {"includePattern": "target/(.*\.jar)", "uploadPattern": "io/inveasy/akka-actors/1.2.0/$1"},
-    {"includePattern": "pom.xml", "uploadPattern": "io/inveasy/akka-actors/1.2.0/akka-actors-1.2.0.pom"}
+    {"includePattern": "target/(.*\.jar)", "uploadPattern": "io/inveasy/akka-actors/1.3.0/$1"},
+    {"includePattern": "pom.xml", "uploadPattern": "io/inveasy/akka-actors/1.3.0/akka-actors-1.3.0.pom"}
   ],
   "publish": true
 }
